@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Map Sample</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="addButton">Add Post</string>
+    <string name="ShowListButton">Show List</string>
+    <string name="postButton">Post</string>
+    <string name="commentEditText">Comment</string>
+    <string name="postImageView">postImage</string>
+    <string name="postItem">Post Item</string>
+    <string name="location">Location</string>
+    <string name="commentTextView">comment</string>
+    <string name="editButton">Edit</string>
+</resources>
