@@ -19,22 +19,22 @@ public class PostListAdapter extends BaseAdapter {
 
     private Context context;
     private int layout;
-    private List<Post> postsList;
+    private ArrayList<Post> postList;
 
-    public PostListAdapter(Context context, int layout, List<Post> postsList) {
+    public PostListAdapter(Context context, int layout, ArrayList<Post> postList) {
         this.context = context;
         this.layout = layout;
-        this.postsList = postsList;
+        this.postList = postList;
     }
 
     @Override
     public int getCount() {
-        return postsList.size();
+        return postList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return postsList.get(position);
+        return postList.get(position);
     }
 
     @Override
@@ -43,8 +43,8 @@ public class PostListAdapter extends BaseAdapter {
     }
 
     private class ViewHolder {
-        TextView comment, location;
         ImageView postImage;
+        TextView txtComment, txtLocation, txtPostDate;
     }
 
     @Override
@@ -56,10 +56,10 @@ public class PostListAdapter extends BaseAdapter {
         if (row == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = inflater.inflate(layout, null);
-
-            holder.postImage = row.findViewById(R.id.postItemImageView);
-            holder.comment = row.findViewById(R.id.postItemTextView);
-            holder.location = row.findViewById(R.id.locaitonTextView);
+            holder.postImage = row.findViewById(R.id.imgIcon);
+            holder.txtComment = row.findViewById(R.id.txtComment);
+            holder.txtLocation = row.findViewById(R.id.txtLocation);
+            holder.txtPostDate = row.findViewById(R.id.txtPostDate);
             row.setTag(holder);
         }
         else
@@ -67,10 +67,11 @@ public class PostListAdapter extends BaseAdapter {
             holder = (ViewHolder) row.getTag();
         }
 
-        Post post = postsList.get(position);
+        Post post = postList.get(position);
 
-        holder.comment.setText(post.getComment());
-        holder.location.setText(post.getLocation());
+        holder.txtComment.setText(post.getComment());
+        holder.txtLocation.setText(post.getLocation());
+        holder.txtPostDate.setText(post.getPostDate());
 
         byte[] postImage = post.getImage();
         Bitmap bitmap = BitmapFactory.decodeByteArray(postImage, 0, postImage.length);

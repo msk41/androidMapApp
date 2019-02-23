@@ -1,13 +1,14 @@
 <resources>
     <string name="app_name">Map Sample</string>
     <string name="title_activity_maps">Map</string>
-    <string name="addButton">Add Post</string>
-    <string name="ShowListButton">Show List</string>
-    <string name="postButton">Post</string>
-    <string name="commentEditText">Comment</string>
+    <string name="commentEditView">Comment</string>
+    <string name="locationTextView">Location Here</string>
+    <string name="dateTextView">Date Here</string>
+    <string name="postButton">POST</string>
     <string name="postImageView">postImage</string>
-    <string name="postItem">Post Item</string>
-    <string name="location">Location</string>
-    <string name="commentTextView">comment</string>
-    <string name="editButton">Edit</string>
+    <string name="commentTextView">Comment Here</string>
+    <string name="editButton">EDIT</string>
+    <string name="updateButton">UPDATE</string>
+    <string name="listButton">POST LIST</string>
+    <string name="addPostButton">ADD POST</string>
 </resources>

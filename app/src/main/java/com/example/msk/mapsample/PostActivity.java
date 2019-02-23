@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,8 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.msk.mapsample.DB.PostOperations;
-import com.example.msk.mapsample.Model.Post;
+import com.example.msk.mapsample.DB.SQLiteHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -28,51 +28,43 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import static com.example.msk.mapsample.MapsActivity.mSQLiteHelper;
+
 public class PostActivity extends AppCompatActivity {
 
-    private static final String EXTRA_ADD_UPDATE = "com.example.msk.mapsample.add_update";
+    public final int REQUEST_CODE_GALLERY = 999;
 
-    private EditText commentEditText;
-    private TextView dateTextView, currentLocationTextView;
+    private EditText editComment;
+    private TextView txtDate, txtCurrentLocation;
     private Button postButton;
     private ImageView postImageView;
-    private String mode;
-    private long postId;
-    private PostOperations postData;
-    private Post oldPost;
-    private Post newPost;
-
-    final int REQUEST_CODE_GALLERY = 999;
+    private double latitude, longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("New Post");
         init();
         final Date currentDateTime = Calendar.getInstance().getTime();
-        dateTextView.setText("Date: " + DateToString(currentDateTime));
+        txtDate.setText("Date: " + DateToString(currentDateTime));
 
         // display current location
         Intent intent = getIntent();
         if (intent != null) {
             String address = intent.getStringExtra("address");
-            currentLocationTextView.setText("Location: " + address);
+            txtCurrentLocation.setText("Location: " + address);
+            latitude = intent.getDoubleExtra("latitude", 0);
+            longitude = intent.getDoubleExtra("longitude", 0);
         }
 
-        newPost = new Post();
-        oldPost = new Post();
-        postData = new PostOperations(this);
-
-        mode = getIntent().getStringExtra(EXTRA_ADD_UPDATE);
-        if (mode.equals("Update")) {
-            postButton.setText("Update");
-            postId = getIntent().getLongExtra("id", 0);
-            initializePost(postId);
-        }
-
+        // select image by on imageView click
         postImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //read external storage permission to select image from gallery
+                //runtime permission for devices android 6.0 and above
                 ActivityCompat.requestPermissions(
                         PostActivity.this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
@@ -81,68 +73,45 @@ public class PostActivity extends AppCompatActivity {
             }
         });
 
+        // add post record to sqlite database
         postButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mode.equals("Add")) {
-                    try {
-                        newPost.setComment(commentEditText.getText().toString());
-                        newPost.setImage(imageViewToByte(postImageView));
-                        newPost.setLocation(currentLocationTextView.getText().toString());
-                        newPost.setPostDate(DateToString(currentDateTime));
-                        newPost.setUpdatedDate(DateToString(currentDateTime));
-
-                        postData.addPost(newPost);
-                        Toast.makeText(getApplicationContext(), "Added successfully!", Toast.LENGTH_SHORT).show();
-                        commentEditText.setText("");
-                        dateTextView.setText("");
-                        currentLocationTextView.setText("");
-                        postImageView.setImageResource(R.mipmap.ic_launcher);
-                        Intent addIntent = new Intent(getApplicationContext(), MapsActivity.class);
-                        startActivity(addIntent);
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    MapsActivity.mSQLiteHelper.insertPost(
+                            editComment.getText().toString().trim(),
+                            imageViewToByte(postImageView),
+                            txtCurrentLocation.getText().toString().trim(),
+                            latitude,
+                            longitude,
+                            DateToString(currentDateTime),
+                            DateToString(currentDateTime)
+                    );
+                    Toast.makeText(getApplicationContext(), "Added successfully!", Toast.LENGTH_SHORT).show();
+                    // reset views
+                    editComment.setText("");
+                    txtDate.setText("");
+                    txtCurrentLocation.setText("");
+                    postImageView.setImageResource(R.mipmap.ic_launcher);
+                    Intent addIntent = new Intent(getApplicationContext(), MapsActivity.class);
+                    startActivity(addIntent);
                 }
-                else if (mode.equals("Update"))
-                {
-                    try {
-                        oldPost.setComment(commentEditText.getText().toString());
-                        oldPost.setImage(imageViewToByte(postImageView));
-                        oldPost.setUpdatedDate(DateToString(currentDateTime));
-                        postData.updatePost(oldPost);
-                        Toast.makeText(getApplicationContext(), "Updated successfully!", Toast.LENGTH_SHORT).show();
-                        Intent updateIntent = new Intent(getApplicationContext(), MapsActivity.class);
-                        startActivity(updateIntent);
-                    }
-                    catch (Exception e ) {
-                        e.printStackTrace();
-                    }
+                catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
     }
 
     private void init() {
-        commentEditText = findViewById(R.id.commentEditText);
-        dateTextView = findViewById(R.id.dateTextView);
-        currentLocationTextView = findViewById(R.id.currentLocationTextView);
+        editComment = findViewById(R.id.commentEditText);
+        txtDate = findViewById(R.id.dateTextView);
+        txtCurrentLocation = findViewById(R.id.currentLocationTextView);
         postButton = findViewById(R.id.postButton);
-        postImageView = findViewById(R.id.postItemImageView);
+        postImageView = findViewById(R.id.postImageView);
     }
 
-    private void initializePost(long postId) {
-        oldPost = postData.getPost(postId);
-        commentEditText.setText(oldPost.getComment());
-        currentLocationTextView.setText(oldPost.getLocation());
-
-        byte[] postImage = oldPost.getImage();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(postImage, 0, postImage.length);
-        postImageView.setImageBitmap(bitmap);
-    }
-
-    private byte[] imageViewToByte(ImageView image) {
+    public static byte[] imageViewToByte(ImageView image) {
         Bitmap bitmap = ( (BitmapDrawable)image.getDrawable() ).getBitmap();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
@@ -150,7 +119,7 @@ public class PostActivity extends AppCompatActivity {
         return byteArray;
     }
 
-    private String DateToString(Date date) {
+    public static String DateToString(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         String formatDate = sdf.format(date);
         return formatDate;
@@ -158,19 +127,17 @@ public class PostActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
         if (requestCode == REQUEST_CODE_GALLERY) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                startActivityForResult(intent, REQUEST_CODE_GALLERY);
+                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent, REQUEST_CODE_GALLERY);
             }
             else {
                 Toast.makeText(getApplicationContext(), "You don't have permission to access file location!",Toast.LENGTH_SHORT).show();
             }
             return;
         }
-
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
@@ -178,10 +145,10 @@ public class PostActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == REQUEST_CODE_GALLERY && resultCode == RESULT_OK && data != null) {
-            Uri uri = data.getData();
+            Uri imageUri = data.getData();
 
             try {
-                InputStream inputStream = getContentResolver().openInputStream(uri);
+                InputStream inputStream = getContentResolver().openInputStream(imageUri);
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                 postImageView.setImageBitmap(bitmap);
 

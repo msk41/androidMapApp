@@ -6,14 +6,18 @@ public class Post {
     private String comment;
     private byte[] image;
     private String location;
+    private double latitude;
+    private double longitude;
     private String postDate;
     private String updatedDate;
 
-    public Post(long postId, String comment, byte[] image, String location, String postDate, String updatedDate) {
+    public Post(long postId, String comment, byte[] image, String location, double latitude, double longitude, String postDate, String updatedDate) {
         this.postId = postId;
         this.comment = comment;
         this.image = image;
         this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.postDate = postDate;
         this.updatedDate = updatedDate;
     }
@@ -52,6 +56,23 @@ public class Post {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public double getLatitude() {
+
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public String getPostDate() {
