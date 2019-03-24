@@ -25,7 +25,7 @@
                     android:layout_height="wrap_content"
                     android:text="Comment: "
                     android:textColor="#000"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -34,7 +34,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/commentTextView"
                     android:textColor="#000"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </TableRow>
             <TableRow>
 
@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:text="Location: "
                     android:textColor="#000"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/locationTextView"
                     android:textColor="#000"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </TableRow>
             <TableRow>
 
@@ -61,7 +61,7 @@
                     android:layout_height="wrap_content"
                     android:text="PostDate: "
                     android:textColor="#000"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dateTextView"
                     android:textColor="#000"
-                    android:textSize="20sp" />
+                    android:textSize="15sp" />
             </TableRow>
         </TableLayout>
     </LinearLayout>

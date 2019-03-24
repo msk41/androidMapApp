@@ -12,6 +12,9 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -27,11 +30,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -45,8 +49,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String address;
     private double currentLatitude, currentLongitude;
     private ArrayList<Post> posts;
+    private boolean isGPSEnabled = false;
+    private boolean isNetworkEnabled = false;
 
     public static SQLiteHelper mSQLiteHelper;
+
+    public static final int REQUEST_CODE_ACCESS_FINE_LOCATION  = 1;
+    public static final int REQUEST_CODE_READ_EXTERNAL_STORAGE = 2;
+    public static final int REQUEST_CODE_GALLERY = 3;
+
+    public final int THUMBNAIL_SIZE = 128;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +76,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // create table in database
         mSQLiteHelper.queryData("CREATE TABLE IF NOT EXISTS POST(id INTEGER PRIMARY KEY AUTOINCREMENT," +
                                                                     " comment VARCHAR, " +
-                                                                    " image BLOB, " +
+                                                                    " image VARCHAR, " +
                                                                     " location VARCHAR, " +
                                                                     " latitude DOUBLE, " +
                                                                     " longitude DOUBLE, " +
@@ -78,7 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(0);
                 String comment = cursor.getString(1);
-                byte[] image = cursor.getBlob(2);
+                String image = cursor.getString(2);
                 String location = cursor.getString(3);
                 double latitude = cursor.getDouble(4);
                 double longitude = cursor.getDouble(5);
@@ -88,7 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-        // add Post record
+        // move to the Add Post page
         addPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,7 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        // show Post list
+        // move to the Post list page
         postListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,15 +146,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng userLocation = new LatLng(currentLatitude, currentLongitude);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
                 Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-
-                // display markers of Post list
-                for (Post post : posts) {
-                    LatLng postLatLng = new LatLng(post.getLatitude(), post.getLongitude());
-                    Bitmap postBitmap = BitmapFactory.decodeByteArray(post.getImage(), 0, post.getImage().length);
-                    mMap.addMarker(new MarkerOptions()
-                            .position(postLatLng)
-                            .icon(BitmapDescriptorFactory.fromBitmap(postBitmap)));
-                }
 
                 try {
                     List<Address> listAddresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
@@ -182,36 +186,128 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
 
+        // check if API level is larger than 23
+        int currentAPIVersion = Build.VERSION.SDK_INT;
+        if (currentAPIVersion >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_CODE_READ_EXTERNAL_STORAGE);
+            }
+            else
+            {
+                // display markers of Post list
+                for (Post post : posts) {
+                    LatLng postLatLng = new LatLng(post.getLatitude(), post.getLongitude());
+                    Uri imageUri = Uri.parse(post.getImage());
+                    try {
+                        Bitmap postBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+//                        Bitmap bitmap = getThumbnail(imageUri);
+                        mMap.addMarker(new MarkerOptions()
+                                .position(postLatLng));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        // check if the map can be used
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != getPackageManager().PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_CODE_ACCESS_FINE_LOCATION);
         }
         else
         {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            LatLng userLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+            // getting GPS status
+            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+            // getting network status
+            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            if (!isGPSEnabled && !isNetworkEnabled) {
+                // no network provider is enabled
+            }
+
+            // get the last location that the user is
+            Location location = null;
+            if (isNetworkEnabled) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                Log.d("Network", "Network Enabled");
+                if (locationManager != null) {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+                if (location != null) {
+                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+                }
+            }
+
+            if (isGPSEnabled) {
+                if (location == null) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                    Log.d("GPS", "GPS Enabled");
+                    if (locationManager != null) {
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    }
+                    if (location != null) {
+                        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+                    }
+                }
+            }
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    // Register the listener with the Location Manager to receive location updates
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0 , 0, locationListener);
+        switch (requestCode) {
+            case REQUEST_CODE_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        // Register the listener with the Location Manager to receive location updates
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0 , 0, locationListener);
+                    }
                 }
             }
+            case REQUEST_CODE_READ_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // do stuff
+                }
+            }
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
     private void init() {
         addPostButton = findViewById(R.id.addPostButton);
         postListButton = findViewById(R.id.postListButton);
+    }
+
+    public Bitmap getThumbnail(Uri uri) throws FileNotFoundException, IOException {
+        InputStream inputStream = this.getContentResolver().openInputStream(uri);
+
+        BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
+        onlyBoundsOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(inputStream, null, onlyBoundsOptions);
+        inputStream.close();
+
+        if ((onlyBoundsOptions.outWidth == -1) || (onlyBoundsOptions.outHeight == -1)) {
+            return null;
+        }
+
+        int originalSize  = (onlyBoundsOptions.outHeight > onlyBoundsOptions.outWidth) ? onlyBoundsOptions.outHeight
+                : onlyBoundsOptions.outWidth;
+
+        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inSampleSize = originalSize / THUMBNAIL_SIZE;
+        inputStream = this.getContentResolver().openInputStream(uri);
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, bitmapOptions);
+        inputStream.close();
+        return bitmap;
     }
 }

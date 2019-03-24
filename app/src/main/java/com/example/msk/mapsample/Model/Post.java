@@ -2,16 +2,16 @@ package com.example.msk.mapsample.Model;
 
 public class Post {
 
-    private long   postId;
+    private int    postId;
     private String comment;
-    private byte[] image;
+    private String image;
     private String location;
     private double latitude;
     private double longitude;
     private String postDate;
     private String updatedDate;
 
-    public Post(long postId, String comment, byte[] image, String location, double latitude, double longitude, String postDate, String updatedDate) {
+    public Post(int postId, String comment, String image, String location, double latitude, double longitude, String postDate, String updatedDate) {
         this.postId = postId;
         this.comment = comment;
         this.image = image;
@@ -25,11 +25,11 @@ public class Post {
     public Post() {
     }
 
-    public long getPostId() {
+    public int getPostId() {
         return postId;
     }
 
-    public void setPostId(long postId) {
+    public void setPostId(int postId) {
         this.postId = postId;
     }
 
@@ -41,11 +41,11 @@ public class Post {
         this.comment = comment;
     }
 
-    public byte[] getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(byte[] image) {
+    public void setImage(String image) {
         this.image = image;
     }
 

@@ -23,7 +23,7 @@
         android:maxLines="4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/postImageView"
+        app:layout_constraintTop_toBottomOf="@+id/updateImageView"
         tools:targetApi="26" />
 
     <TextView
@@ -78,7 +78,7 @@
         app:layout_constraintTop_toBottomOf="@+id/dateTextView" />
 
     <ImageView
-        android:id="@+id/postImageView"
+        android:id="@+id/updateImageView"
         android:layout_width="160dp"
         android:layout_height="160dp"
         android:layout_marginStart="8dp"

@@ -7,7 +7,7 @@
     tools:context=".PostPage">
 
     <ImageView
-        android:id="@+id/postImageView"
+        android:id="@+id/updateImageView"
         android:layout_width="160dp"
         android:layout_height="160dp"
         android:layout_marginStart="8dp"
@@ -33,7 +33,7 @@
         android:text="@string/locationTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/postImageView" />
+        app:layout_constraintTop_toBottomOf="@+id/updateImageView" />
 
     <TextView
         android:id="@+id/commentTextView"

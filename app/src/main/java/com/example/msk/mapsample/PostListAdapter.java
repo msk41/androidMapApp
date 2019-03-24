@@ -2,7 +2,8 @@ package com.example.msk.mapsample;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,8 @@ import android.widget.TextView;
 
 import com.example.msk.mapsample.Model.Post;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class PostListAdapter extends BaseAdapter {
 
@@ -73,8 +74,13 @@ public class PostListAdapter extends BaseAdapter {
         holder.txtLocation.setText(post.getLocation());
         holder.txtPostDate.setText(post.getPostDate());
 
-        byte[] postImage = post.getImage();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(postImage, 0, postImage.length);
+        Uri imageUri = Uri.parse(post.getImage());
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         holder.postImage.setImageBitmap(bitmap);
 
         return row;

@@ -17,7 +17,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(sql);
     }
 
-    public void insertPost(String comment, byte[] image, String location, double latitude, double longitude, String postDate, String updatedDate){
+    public void insertPost(String comment, String image, String location, double latitude, double longitude, String postDate, String updatedDate){
         SQLiteDatabase database = getWritableDatabase();
         String sql = "INSERT INTO POST VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -25,7 +25,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         statement.clearBindings();
 
         statement.bindString(1, comment);
-        statement.bindBlob(2, image);
+        statement.bindString(2, image);
         statement.bindString(3, location);
         statement.bindDouble(4, latitude);
         statement.bindDouble(5, longitude);
@@ -35,14 +35,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         statement.executeInsert();
     }
 
-    public void updatePost(String comment, byte[] image, String updatedDate, int id){
+    public void updatePost(String comment, String image, String updatedDate, int id){
         SQLiteDatabase database = getWritableDatabase();
-        String sql = "UPDATE RECORD SET comment=?, image=?, updatedDate=? WHERE id=?";
+        String sql = "UPDATE POST SET comment=?, image=?, updatedDate=? WHERE id=?";
 
         SQLiteStatement statement = database.compileStatement(sql);
 
         statement.bindString(1, comment);
-        statement.bindBlob(2, image);
+        statement.bindString(2, image);
         statement.bindString(3, updatedDate);
         statement.bindDouble(4, (double)id);
 
@@ -52,7 +52,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     public void deletePost(int id){
         SQLiteDatabase database = getWritableDatabase();
-        String sql = "DELETE FROM RECORD WHERE id=?";
+        String sql = "DELETE FROM POST WHERE id=?";
 
         SQLiteStatement statement = database.compileStatement(sql);
         statement.clearBindings();
