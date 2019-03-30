@@ -97,9 +97,12 @@ public class PostList extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // do stuff
                 }
+                break;
             }
-            default:
+            default: {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+            }
         }
     }
 }

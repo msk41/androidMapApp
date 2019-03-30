@@ -2,18 +2,23 @@ package com.example.msk.mapsample;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.msk.mapsample.Model.Post;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class PostListAdapter extends BaseAdapter {
@@ -75,13 +80,31 @@ public class PostListAdapter extends BaseAdapter {
         holder.txtPostDate.setText(post.getPostDate());
 
         Uri imageUri = Uri.parse(post.getImage());
-        Bitmap bitmap = null;
+        Log.d("Uri", post.getImage());
+//        Bitmap bitmap = null;
+//        try {
+//            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        holder.postImage.setImageBitmap(bitmap);
+
+        // declare a stream to read the image data from the SD Card.
+        InputStream inputStream;
+
+        // get an input stream, based on the URI of the image.
         try {
-            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
-        } catch (IOException e) {
+            inputStream = context.getContentResolver().openInputStream(imageUri);
+
+            // get a bitmap from the stream.
+            Bitmap image = BitmapFactory.decodeStream(inputStream);
+
+            // show the image to the user
+            holder.postImage.setImageBitmap(image);
+
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        holder.postImage.setImageBitmap(bitmap);
 
         return row;
     }

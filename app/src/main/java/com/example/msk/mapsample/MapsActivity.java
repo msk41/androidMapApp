@@ -57,6 +57,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final int REQUEST_CODE_ACCESS_FINE_LOCATION  = 1;
     public static final int REQUEST_CODE_READ_EXTERNAL_STORAGE = 2;
     public static final int REQUEST_CODE_GALLERY = 3;
+    public static final int REQUEST_CODE_CAMERA = 4;
 
     public final int THUMBNAIL_SIZE = 128;
 
@@ -272,14 +273,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0 , 0, locationListener);
                     }
                 }
+                break;
             }
             case REQUEST_CODE_READ_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // do stuff
                 }
+                break;
             }
-            default:
+            default: {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+            }
         }
     }
 
