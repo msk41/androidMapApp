@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,38 +21,49 @@ import com.example.msk.mapsample.Model.Post;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
-public class PostListAdapter extends BaseAdapter {
+public class PostListAdapter extends BaseAdapter implements Filterable {
 
     private Context context;
     private int layout;
+    private PostFilter postFilter;
     private ArrayList<Post> postList;
+    private ArrayList<Post> filteredPostList;
 
     public PostListAdapter(Context context, int layout, ArrayList<Post> postList) {
         this.context = context;
         this.layout = layout;
         this.postList = postList;
+        this.filteredPostList = postList;
+
+        getFilter();
     }
 
     @Override
     public int getCount() {
-        return postList.size();
+        return filteredPostList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return postList.get(position);
+        return filteredPostList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return filteredPostList.get(position).getPostId();
     }
 
-    private class ViewHolder {
-        ImageView postImage;
-        TextView txtComment, txtLocation, txtPostDate;
+    @Override
+    public Filter getFilter() {
+        if (postFilter == null) {
+            postFilter = new PostFilter();
+        }
+
+        return postFilter;
     }
 
     @Override
@@ -73,7 +86,7 @@ public class PostListAdapter extends BaseAdapter {
             holder = (ViewHolder) row.getTag();
         }
 
-        Post post = postList.get(position);
+        Post post = filteredPostList.get(position);
 
         holder.txtComment.setText(post.getComment());
         holder.txtLocation.setText(post.getLocation());
@@ -81,13 +94,6 @@ public class PostListAdapter extends BaseAdapter {
 
         Uri imageUri = Uri.parse(post.getImage());
         Log.d("Uri", post.getImage());
-//        Bitmap bitmap = null;
-//        try {
-//            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        holder.postImage.setImageBitmap(bitmap);
 
         // declare a stream to read the image data from the SD Card.
         InputStream inputStream;
@@ -107,6 +113,42 @@ public class PostListAdapter extends BaseAdapter {
         }
 
         return row;
+    }
+
+    private class ViewHolder {
+        ImageView postImage;
+        TextView txtComment, txtLocation, txtPostDate;
+    }
+
+    /*
+     * Custom filter for post list
+     * Filter content in post list according to the search text
+     */
+    private class PostFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults filterResults = new FilterResults();
+            if (constraint != null && constraint.length() > 0) {
+
+                // search the content in post list
+                List<Post> tempList = MapsActivity.mSQLiteHelper.search(constraint.toString());
+
+                filterResults.count = tempList.size();
+                filterResults.values = tempList;
+            } else {
+                filterResults.count = postList.size();
+                filterResults.values = postList;
+            }
+
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            filteredPostList = (ArrayList<Post>) results.values;
+            notifyDataSetChanged();
+        }
     }
 
 }

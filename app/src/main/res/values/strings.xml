@@ -11,4 +11,6 @@
     <string name="updateButton">UPDATE</string>
     <string name="listButton">POST LIST</string>
     <string name="addPostButton">ADD POST</string>
+    <string name="search_title">search</string>
+    <string name="search_hint">Type your keyword here</string>
 </resources>

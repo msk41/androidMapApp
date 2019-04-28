@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -36,7 +37,7 @@ public class PostPage extends AppCompatActivity {
     private ImageView postImageView;
     private TextView txtLocation, txtComment;
     private Button editButton;
-    private String comment;
+    private String postComment;
     private int postId;
     private Bitmap bitmap = null;
     private String imagePath;
@@ -50,16 +51,28 @@ public class PostPage extends AppCompatActivity {
         // set post page
         final Intent intent = getIntent();
         postId = intent.getIntExtra("id", 0);
-        Uri imageUri = Uri.parse(intent.getStringExtra(("Image")));
+
+        Cursor cursor = MapsActivity.mSQLiteHelper.getPost("SELECT comment, " +
+                                                                      " image, " +
+                                                                      " location " +
+                                                                      " FROM POST " +
+                                                                      " WHERE id =" + postId);
+
+        cursor.moveToFirst();
+        String comment = cursor.getString(0);
+        String image = cursor.getString(1);
+        String location = cursor.getString(2);
+
+        Uri imageUri = Uri.parse(image);
         try {
             bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
         } catch (IOException e) {
             e.printStackTrace();
         }
         postImageView.setImageBitmap(bitmap);
-        comment = intent.getStringExtra("Comment");
         txtComment.setText(comment);
-        txtLocation.setText(intent.getStringExtra("Location"));
+        postComment = comment;
+        txtLocation.setText(location);
 
         // update or delete post record by on editButton click
         editButton.setOnClickListener(new View.OnClickListener() {
@@ -133,7 +146,7 @@ public class PostPage extends AppCompatActivity {
         ImageView updateImageView = dialog.findViewById(R.id.updateImageView);
         updateImageView.setImageBitmap(bitmap);
         final EditText editComment = dialog.findViewById(R.id.commentEditText);
-        editComment.setText(comment);
+        editComment.setText(postComment);
         Button updateButton = dialog.findViewById(R.id.updateButton);
 
         // set width of dialog

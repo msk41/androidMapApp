@@ -117,6 +117,7 @@ public class PostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
+                    // modify txtCurrentLocation TextView to insert post
                     txtCurrentLocation.setText(address);
                     MapsActivity.mSQLiteHelper.insertPost(
                             editComment.getText().toString().trim(),
@@ -138,6 +139,9 @@ public class PostActivity extends AppCompatActivity {
                 }
                 catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "Unable to add new post", Toast.LENGTH_LONG).show();
+                    // modify txtCurrentLocation TextView to display
+                    txtCurrentLocation.setText("Location: " + address);
                 }
             }
         });
@@ -183,6 +187,9 @@ public class PostActivity extends AppCompatActivity {
                         getApplicationContext().getPackageName() + ".fileprovider",     /* "com.example.msk.mapsample.fileprovider" */
                         photoFile);
 
+                imagePath = photoURI.toString();
+                Log.d("imagePath", imagePath);
+
                 // tell the camera where to save the photo.
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 // tell the camera to request WRITE permission.
@@ -206,9 +213,6 @@ public class PostActivity extends AppCompatActivity {
 
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = imageFile.getAbsolutePath();
-
-        imagePath = Uri.fromFile(imageFile).toString();
-        Log.d("imagePath", imagePath);
 
         return imageFile;
     }
@@ -251,7 +255,7 @@ public class PostActivity extends AppCompatActivity {
             case REQUEST_CODE_GALLERY: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    // invoke the image gallery using an implict intent
+                    // invoke the image gallery using an implicit intent
 //                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
                     Intent galleryIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 

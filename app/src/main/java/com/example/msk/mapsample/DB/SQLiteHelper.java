@@ -6,6 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 
+import com.example.msk.mapsample.Model.Post;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class SQLiteHelper extends SQLiteOpenHelper {
 
     public SQLiteHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -65,6 +70,44 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public Cursor getPost(String sql){
         SQLiteDatabase database = getReadableDatabase();
         return database.rawQuery(sql, null);
+    }
+
+    public List<Post> search(String searchTerm) {
+        SQLiteDatabase database = getReadableDatabase();
+        String sql = "SELECT  id, " +
+                " comment, " +
+                " image, " +
+                " location, " +
+                " latitude, " +
+                " longitude, " +
+                " postDate, " +
+                " updatedDate " +
+                " FROM POST " +
+                " WHERE comment  LIKE '%" + searchTerm + "%' OR" +
+                "       location LIKE '%" + searchTerm + "%' OR" +
+                "       postDate LIKE '%" + searchTerm + "%' OR" +
+                "       updatedDate LIKE '%" + searchTerm + "%'";
+
+        // execute the sql statement
+        Cursor cursor = database.rawQuery(sql, null);
+
+        ArrayList<Post> posts = new ArrayList<>();
+
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(0);
+                String comment = cursor.getString(1);
+                String image = cursor.getString(2);
+                String location = cursor.getString(3);
+                double latitude = cursor.getDouble(4);
+                double longitude = cursor.getDouble(5);
+                String postDate = cursor.getString(6);
+                String updatedDate = cursor.getString(7);
+                posts.add(new Post(id, comment, image, location, latitude, longitude, postDate, updatedDate));
+            }
+        }
+        cursor.close();
+        return posts;
     }
 
     @Override

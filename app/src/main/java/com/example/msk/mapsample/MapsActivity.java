@@ -86,7 +86,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // get Post list
         posts = new ArrayList<>();
-        Cursor cursor = mSQLiteHelper.getPost("SELECT * FROM POST");
+        Cursor cursor = mSQLiteHelper.getPost("SELECT id, " +
+                                                         " comment, " +
+                                                         " image, " +
+                                                         " location, " +
+                                                         " latitude, " +
+                                                         " longitude, " +
+                                                         " postDate, " +
+                                                         " updatedDate " +
+                                                         " FROM POST ");
         posts.clear();
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
