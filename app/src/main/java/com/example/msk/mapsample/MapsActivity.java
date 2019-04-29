@@ -48,7 +48,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button addPostButton, postListButton;
     private String address;
     private double currentLatitude, currentLongitude;
-    private ArrayList<Post> posts;
+    private ArrayList<Post> postList;
     private boolean isGPSEnabled = false;
     private boolean isNetworkEnabled = false;
 
@@ -85,28 +85,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                     " updatedDate VARCHAR) ");
 
         // get Post list
-        posts = new ArrayList<>();
-        Cursor cursor = mSQLiteHelper.getPost("SELECT id, " +
-                                                         " comment, " +
-                                                         " image, " +
-                                                         " location, " +
+        postList = new ArrayList<>();
+        Cursor cursor = mSQLiteHelper.getPost("SELECT image, " +
                                                          " latitude, " +
-                                                         " longitude, " +
-                                                         " postDate, " +
-                                                         " updatedDate " +
+                                                         " longitude " +
                                                          " FROM POST ");
-        posts.clear();
+        postList.clear();
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
-                int id = cursor.getInt(0);
-                String comment = cursor.getString(1);
-                String image = cursor.getString(2);
-                String location = cursor.getString(3);
-                double latitude = cursor.getDouble(4);
-                double longitude = cursor.getDouble(5);
-                String postDate = cursor.getString(6);
-                String updatedDate = cursor.getString(7);
-                posts.add(new Post(id, comment, image, location, latitude, longitude, postDate, updatedDate));
+                String image = cursor.getString(0);
+                double latitude = cursor.getDouble(1);
+                double longitude = cursor.getDouble(2);
+                Post post = new Post();
+                post.setImage(image);
+                post.setLatitude(latitude);
+                post.setLongitude(longitude);
+                postList.add(post);
             }
         }
 
@@ -207,7 +201,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             else
             {
                 // display markers of Post list
-                for (Post post : posts) {
+                for (Post post : postList) {
                     LatLng postLatLng = new LatLng(post.getLatitude(), post.getLongitude());
                     Uri imageUri = Uri.parse(post.getImage());
                     try {

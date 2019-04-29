@@ -75,39 +75,39 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public List<Post> search(String searchTerm) {
         SQLiteDatabase database = getReadableDatabase();
         String sql = "SELECT  id, " +
-                " comment, " +
-                " image, " +
-                " location, " +
-                " latitude, " +
-                " longitude, " +
-                " postDate, " +
-                " updatedDate " +
-                " FROM POST " +
-                " WHERE comment  LIKE '%" + searchTerm + "%' OR" +
-                "       location LIKE '%" + searchTerm + "%' OR" +
-                "       postDate LIKE '%" + searchTerm + "%' OR" +
-                "       updatedDate LIKE '%" + searchTerm + "%'";
+                            " comment, " +
+                            " image, " +
+                            " location, " +
+                            " postDate " +
+                            " FROM POST " +
+                            " WHERE comment     LIKE '%" + searchTerm + "%' OR" +
+                            "       location    LIKE '%" + searchTerm + "%' OR" +
+                            "       postDate    LIKE '%" + searchTerm + "%' OR" +
+                            "       updatedDate LIKE '%" + searchTerm + "%'";
 
         // execute the sql statement
         Cursor cursor = database.rawQuery(sql, null);
 
-        ArrayList<Post> posts = new ArrayList<>();
+        ArrayList<Post> postList = new ArrayList<>();
 
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
-                int id = cursor.getInt(0);
+                int postId = cursor.getInt(0);
                 String comment = cursor.getString(1);
                 String image = cursor.getString(2);
                 String location = cursor.getString(3);
-                double latitude = cursor.getDouble(4);
-                double longitude = cursor.getDouble(5);
-                String postDate = cursor.getString(6);
-                String updatedDate = cursor.getString(7);
-                posts.add(new Post(id, comment, image, location, latitude, longitude, postDate, updatedDate));
+                String postDate = cursor.getString(4);
+                Post post = new Post();
+                post.setPostId(postId);
+                post.setComment(comment);
+                post.setImage(image);
+                post.setLocation(location);
+                post.setPostDate(postDate);
+                postList.add(post);
             }
         }
         cursor.close();
-        return posts;
+        return postList;
     }
 
     @Override

@@ -69,22 +69,22 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
                                                                       " comment, " +
                                                                       " image, " +
                                                                       " location, " +
-                                                                      " latitude, " +
-                                                                      " longitude, " +
-                                                                      " postDate, " +
-                                                                      " updatedDate " +
+                                                                      " postDate " +
                                                                       " FROM POST ");
         postList.clear();
         while (cursor.moveToNext()) {
-            int id = cursor.getInt(0);
+            int postId = cursor.getInt(0);
             String comment = cursor.getString(1);
             String image = cursor.getString(2);
             String location = cursor.getString(3);
-            double latitude = cursor.getDouble(4);
-            double longitude = cursor.getDouble(5);
-            String postDate = cursor.getString(6);
-            String updatedDate = cursor.getString(7);
-            postList.add(new Post(id, comment, image, location, latitude, longitude, postDate, updatedDate));
+            String postDate = cursor.getString(4);
+            Post post = new Post();
+            post.setPostId(postId);
+            post.setComment(comment);
+            post.setImage(image);
+            post.setLocation(location);
+            post.setPostDate(postDate);
+            postList.add(post);
         }
         postListAdapter.notifyDataSetChanged();
 
@@ -103,7 +103,7 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
                     searchView.setQuery("", false);
                 }
                 Intent intent = new Intent(getApplicationContext(), PostPage.class);
-                intent.putExtra("id", (int) id);
+                intent.putExtra("id", (int) postListAdapter.getItemId(position));
                 startActivity(intent);
             }
         });
