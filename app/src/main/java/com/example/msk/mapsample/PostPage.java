@@ -64,6 +64,7 @@ public class PostPage extends AppCompatActivity {
         String location = cursor.getString(2);
 
         Uri imageUri = Uri.parse(image);
+        imagePath = imageUri.toString();
         try {
             bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
         } catch (IOException e) {

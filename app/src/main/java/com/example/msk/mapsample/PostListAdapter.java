@@ -4,8 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +12,11 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.msk.mapsample.Model.Post;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +71,6 @@ public class PostListAdapter extends BaseAdapter implements Filterable {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             row = inflater.inflate(layout, null);
             holder.postImage = row.findViewById(R.id.imgIcon);
-            holder.txtComment = row.findViewById(R.id.txtComment);
             holder.txtLocation = row.findViewById(R.id.txtLocation);
             holder.txtPostDate = row.findViewById(R.id.txtPostDate);
             row.setTag(holder);
@@ -88,12 +82,10 @@ public class PostListAdapter extends BaseAdapter implements Filterable {
 
         Post post = filteredPostList.get(position);
 
-        holder.txtComment.setText(post.getComment());
         holder.txtLocation.setText(post.getLocation());
         holder.txtPostDate.setText(post.getPostDate());
 
         Uri imageUri = Uri.parse(post.getImage());
-        Log.d("Uri", post.getImage());
 
         // declare a stream to read the image data from the SD Card.
         InputStream inputStream;
@@ -117,7 +109,7 @@ public class PostListAdapter extends BaseAdapter implements Filterable {
 
     private class ViewHolder {
         ImageView postImage;
-        TextView txtComment, txtLocation, txtPostDate;
+        TextView txtLocation, txtPostDate;
     }
 
     /*

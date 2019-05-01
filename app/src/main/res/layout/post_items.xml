@@ -12,31 +12,15 @@
         <ImageView
             android:id="@+id/imgIcon"
             android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_height="match_parent"
             android:contentDescription="@string/postImageView"
+            android:scaleType="fitXY"
             android:src="@mipmap/ic_launcher" />
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TableRow>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Comment: "
-                    android:textColor="#000"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtComment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/commentTextView"
-                    android:textColor="#000"
-                    android:textSize="15sp" />
-            </TableRow>
-            <TableRow>
+            <TableRow android:paddingBottom="10dp">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -50,11 +34,13 @@
                     android:id="@+id/txtLocation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:maxWidth="20dp"
                     android:text="@string/locationTextView"
                     android:textColor="#000"
                     android:textSize="15sp" />
             </TableRow>
-            <TableRow>
+
+            <TableRow android:paddingBottom="10dp">
 
                 <TextView
                     android:layout_width="match_parent"

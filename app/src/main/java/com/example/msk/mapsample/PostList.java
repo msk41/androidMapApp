@@ -13,7 +13,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -66,7 +65,6 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
 
         // show Post list
         Cursor cursor = MapsActivity.mSQLiteHelper.getPost("SELECT id, " +
-                                                                      " comment, " +
                                                                       " image, " +
                                                                       " location, " +
                                                                       " postDate " +
@@ -74,13 +72,11 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
         postList.clear();
         while (cursor.moveToNext()) {
             int postId = cursor.getInt(0);
-            String comment = cursor.getString(1);
-            String image = cursor.getString(2);
-            String location = cursor.getString(3);
-            String postDate = cursor.getString(4);
+            String image = cursor.getString(1);
+            String location = cursor.getString(2);
+            String postDate = cursor.getString(3);
             Post post = new Post();
             post.setPostId(postId);
-            post.setComment(comment);
             post.setImage(image);
             post.setLocation(location);
             post.setPostDate(postDate);
