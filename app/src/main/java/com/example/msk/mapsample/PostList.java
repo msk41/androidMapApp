@@ -146,9 +146,7 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        postListAdapter.getFilter().filter(query);
-
-        return true;
+        return false;
     }
 
     @Override
