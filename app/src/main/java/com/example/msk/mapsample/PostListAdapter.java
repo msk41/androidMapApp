@@ -18,6 +18,7 @@ import com.example.msk.mapsample.Model.Post;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PostListAdapter extends BaseAdapter implements Filterable {
@@ -139,6 +140,7 @@ public class PostListAdapter extends BaseAdapter implements Filterable {
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             filteredPostList = (ArrayList<Post>) results.values;
+            Collections.reverse(filteredPostList);
             notifyDataSetChanged();
         }
     }

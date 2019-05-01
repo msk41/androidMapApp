@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.example.msk.mapsample.Model.Post;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.example.msk.mapsample.MapsActivity.REQUEST_CODE_READ_EXTERNAL_STORAGE;
 
@@ -82,6 +83,9 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
             post.setPostDate(postDate);
             postList.add(post);
         }
+
+        // order in posting
+        Collections.reverse(postList);
         postListAdapter.notifyDataSetChanged();
 
         if (postList.size()==0){
@@ -94,10 +98,10 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // close search view if it's visible
-                if (searchView.isShown()) {
-                    searchMenuItem.collapseActionView();
-                    searchView.setQuery("", false);
-                }
+//                if (searchView.isShown()) {
+//                    searchMenuItem.collapseActionView();
+//                    searchView.setQuery("", false);
+//                }
                 Intent intent = new Intent(getApplicationContext(), PostPage.class);
                 intent.putExtra("id", (int) postListAdapter.getItemId(position));
                 startActivity(intent);
@@ -149,6 +153,8 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        return false;
+        postListAdapter.getFilter().filter(newText);
+
+        return true;
     }
 }
