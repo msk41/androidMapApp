@@ -83,7 +83,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                             " WHERE comment     LIKE '%" + searchTerm + "%' OR" +
                             "       location    LIKE '%" + searchTerm + "%' OR" +
                             "       postDate    LIKE '%" + searchTerm + "%' OR" +
-                            "       updatedDate LIKE '%" + searchTerm + "%'";
+                            "       updatedDate LIKE '%" + searchTerm + "%'"    +
+                            " ORDER BY postDate DESC ";
 
         // execute the sql statement
         Cursor cursor = database.rawQuery(sql, null);

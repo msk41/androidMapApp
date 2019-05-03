@@ -25,7 +25,6 @@ import android.widget.Toast;
 import com.example.msk.mapsample.Model.Post;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import static com.example.msk.mapsample.MapsActivity.REQUEST_CODE_READ_EXTERNAL_STORAGE;
 
@@ -69,7 +68,8 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
                                                                       " image, " +
                                                                       " location, " +
                                                                       " postDate " +
-                                                                      " FROM POST ");
+                                                                      " FROM POST " +
+                                                                      " ORDER BY postDate DESC");
         postList.clear();
         while (cursor.moveToNext()) {
             int postId = cursor.getInt(0);
@@ -83,9 +83,6 @@ public class PostList extends AppCompatActivity implements SearchView.OnQueryTex
             post.setPostDate(postDate);
             postList.add(post);
         }
-
-        // order in posting
-        Collections.reverse(postList);
         postListAdapter.notifyDataSetChanged();
 
         if (postList.size()==0){
