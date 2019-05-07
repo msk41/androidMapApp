@@ -16,13 +16,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 import com.example.msk.mapsample.DB.SQLiteHelper;
 import com.example.msk.mapsample.Model.Post;
@@ -45,7 +44,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private Button addPostButton, postListButton;
     private String address;
     private double currentLatitude, currentLongitude;
     private ArrayList<Post> postList;
@@ -59,6 +57,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final int REQUEST_CODE_GALLERY = 3;
     public static final int REQUEST_CODE_CAMERA = 4;
 
+    public static final int LEFT_TAB = 0;
+    public static final int CENTER_TAB = 1;
+    public static final int RIGHT_TAB = 2;
+
     public final int THUMBNAIL_SIZE = 128;
 
 
@@ -66,11 +68,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        init();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // get the reference of TabLayout
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
 
         // create database
         mSQLiteHelper = new SQLiteHelper(this, "POSTDB.sqlite", null, 1);
@@ -104,24 +108,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-        // move to the Add Post page
-        addPostButton.setOnClickListener(new View.OnClickListener() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PostActivity.class);
-                intent.putExtra("address", address);
-                intent.putExtra("latitude", currentLatitude);
-                intent.putExtra("longitude", currentLongitude);
-                startActivity(intent);
+            public void onTabSelected(TabLayout.Tab tab) {
+                Intent intent;
+                // get the current selected tab's position
+                switch (tab.getPosition()) {
+                    case LEFT_TAB:
+                        break;
+                    case CENTER_TAB:
+                        intent = new Intent(getApplicationContext(), PostActivity.class);
+                        intent.putExtra("address", address);
+                        intent.putExtra("latitude", currentLatitude);
+                        intent.putExtra("longitude", currentLongitude);
+                        startActivity(intent);
+                        break;
+                    case RIGHT_TAB:
+                        intent = new Intent(getApplicationContext(), PostList.class);
+                        startActivity(intent);
+                        break;
+                }
             }
-        });
 
-        // move to the Post list page
-        postListButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PostList.class);
-                startActivity(intent);
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
             }
         });
     }
@@ -288,11 +304,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             }
         }
-    }
-
-    private void init() {
-        addPostButton = findViewById(R.id.addPostButton);
-        postListButton = findViewById(R.id.postListButton);
     }
 
     public Bitmap getThumbnail(Uri uri) throws FileNotFoundException, IOException {

@@ -12,32 +12,32 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
+        android:layout_height="wrap_content"
         tools:context=".MapsActivity" />
 
-    <Button
-        android:id="@+id/addPostButton"
-        android:layout_width="wrap_content"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
-        android:layout_marginLeft="36dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/addPostButton"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map" />
+        app:tabBackground="@android:color/background_light">
 
-    <Button
-        android:id="@+id/postListButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/listButton"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/addPostButton"
-        app:layout_constraintTop_toBottomOf="@+id/map" />
+        <android.support.design.widget.TabItem
+            android:id="@+id/leftTab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/LeftTabItemText" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/centerTab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/CenterTabItemText" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/rightTab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/RightTabItemText" />
+    </android.support.design.widget.TabLayout>
+
 </android.support.constraint.ConstraintLayout>
