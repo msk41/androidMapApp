@@ -22,3 +22,7 @@ This app has the function below.
 ### Installing
 
 You only have to change google_maps_key in google_maps_api.xml
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE.txt](https://github.com/msk41/map_app/blob/master/LICENSE.txt) file for details
